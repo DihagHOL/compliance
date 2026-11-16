@@ -208,8 +208,17 @@ const Pim = {
   // Der vollständige Ist-Stand: berechtigte und aktive Zuweisungen, Benutzerdaten,
   // aufgelöste Gruppen. pimVerfuegbar=false heißt: ohne PIM-Lizenz nur die
   // aktiven Zuweisungen aus der klassischen Schnittstelle.
+  // Gleichzeitige Aufrufer teilen den laufenden Abruf. Dashboard und technische Identitäten
+  // fragten sonst beide dieselben Zuweisungen ab.
   async lade(force = false) {
     if (!force && this._stand && Date.now() - this._stand.zeit < 120000) return this._stand;
+    if (!force && this._standLauf) return this._standLauf;
+    const lauf = this._ladeFrisch();
+    this._standLauf = lauf;
+    try { return await lauf; } finally { if (this._standLauf === lauf) this._standLauf = null; }
+  },
+
+  async _ladeFrisch() {
     const hinweise = [];
     let pimVerfuegbar = true, aktiv = [], berechtigt = [];
     try {
@@ -964,6 +973,12 @@ Object.assign(Pim, {
           kritisch: CC_KRITISCHE_RECHTE.test(wert), seit: z.createdDateTime || "" });
       });
     });
+    // Die Einzelheiten der bis hier bekannten Identitäten laufen schon los, während die
+    // Rollendaten noch unterwegs sind. Wer erst über eine Verzeichnisrolle dazukommt, folgt danach.
+    const zuerst = Object.values(apps);
+    const zuerstLauf = parallelAbarbeiten(zuerst, 5, a => this._identitaetEinzelheiten(a, s));
+    zuerstLauf.catch(() => {});   // ein Fehler wird unten beim await gemeldet, nicht als unbehandelt
+
     // Dienstprinzipale mit Verzeichnisrollen gehören ebenfalls dazu (§ 6).
     try {
       const stand = await this.lade();
@@ -973,35 +988,9 @@ Object.assign(Pim, {
       });
     } catch (e) { /* ohne Rollendaten nur die Anwendungsberechtigungen */ }
 
-    await parallelAbarbeiten(Object.values(apps), 5, async a => {
-      // Eigentümer und Dienstprinzipal hängen nicht voneinander ab: beide Abrufe laufen gleichzeitig.
-      const besitzerLauf = graphFetchAll(`/servicePrincipals/${a.spId}/owners?$select=userPrincipalName,displayName`, { scopes: s }, 50).catch(() => []);
-      const sp = await graphFetch(`/servicePrincipals/${a.spId}?$select=id,appId,displayName,appOwnerOrganizationId,servicePrincipalType,accountEnabled,passwordCredentials,keyCredentials`, { scopes: s });
-      a.appId = sp.appId;
-      a.name = sp.displayName || a.name;
-      a.aktiviert = sp.accountEnabled !== false;
-      a.eigenerMandant = sp.appOwnerOrganizationId === CC_CONFIG.tenantId;
-      a.typ = sp.servicePrincipalType === "ManagedIdentity" ? "verwaltete Identität"
-        : a.eigenerMandant ? "eigene App"
-        : CC_MICROSOFT_MANDANTEN.includes(sp.appOwnerOrganizationId) ? "Microsoft-Dienst" : "Fremd-App";
-      const geheim = (x, art) => ({ art, name: x.displayName || "", start: x.startDateTime || "", ende: x.endDateTime || "" });
-      a.geheimnisse = [...(sp.passwordCredentials || []).map(x => geheim(x, "Kennwort")), ...(sp.keyCredentials || []).map(x => geheim(x, "Zertifikat"))];
-      const besitzer = await besitzerLauf;
-      a.eigentuemer = besitzer.map(o => o.userPrincipalName || o.displayName).filter(Boolean);
-      if (a.eigenerMandant) {
-        const app = ((await graphFetch(`/applications?$filter=appId eq '${a.appId}'&$select=id,passwordCredentials,keyCredentials`, { scopes: s })).value || [])[0];
-        if (app) {
-          a.appObjektId = app.id;
-          a.geheimnisse.push(...(app.passwordCredentials || []).map(x => geheim(x, "Kennwort")), ...(app.keyCredentials || []).map(x => geheim(x, "Zertifikat")));
-          const appBesitzer = await graphFetchAll(`/applications/${app.id}/owners?$select=userPrincipalName,displayName`, { scopes: s }, 50).catch(() => []);
-          a.eigentuemer = [...new Set([...a.eigentuemer, ...appBesitzer.map(o => o.userPrincipalName || o.displayName).filter(Boolean)])];
-        }
-      }
-      // Zertifikate verwalteter Identitäten erneuert Azure selbst; sie werden nicht bewertet.
-      if (a.typ === "verwaltete Identität") a.geheimnisse = [];
-      a.portal = `https://entra.microsoft.com/#view/Microsoft_AAD_IAM/ManagedAppMenuBlade/~/Permissions/objectId/${a.spId}/appId/${a.appId}`;
-      a.letzteAnmeldung = null;   // null = unbekannt, "" = keine Anmeldung gefunden
-    });
+    await zuerstLauf;
+    await parallelAbarbeiten(Object.values(apps).filter(a => !zuerst.includes(a)), 5, a => this._identitaetEinzelheiten(a, s));
+
 
     const liste = Object.values(apps).sort((x, y) => x.name.localeCompare(y.name, "de"));
     if (mitAnmeldung) {
@@ -1017,6 +1006,37 @@ Object.assign(Pim, {
     }
     this._apps = { zeit: Date.now(), liste, mitAnmeldung };
     return liste;
+  },
+
+  // Einzelheiten einer Identität: Typ, Geheimnisse, Eigentümer. Schreibt in das Objekt a.
+  async _identitaetEinzelheiten(a, s) {
+    // Eigentümer und Dienstprinzipal hängen nicht voneinander ab: beide Abrufe laufen gleichzeitig.
+    const besitzerLauf = graphFetchAll(`/servicePrincipals/${a.spId}/owners?$select=userPrincipalName,displayName`, { scopes: s }, 50).catch(() => []);
+    const sp = await graphFetch(`/servicePrincipals/${a.spId}?$select=id,appId,displayName,appOwnerOrganizationId,servicePrincipalType,accountEnabled,passwordCredentials,keyCredentials`, { scopes: s });
+    a.appId = sp.appId;
+    a.name = sp.displayName || a.name;
+    a.aktiviert = sp.accountEnabled !== false;
+    a.eigenerMandant = sp.appOwnerOrganizationId === CC_CONFIG.tenantId;
+    a.typ = sp.servicePrincipalType === "ManagedIdentity" ? "verwaltete Identität"
+      : a.eigenerMandant ? "eigene App"
+      : CC_MICROSOFT_MANDANTEN.includes(sp.appOwnerOrganizationId) ? "Microsoft-Dienst" : "Fremd-App";
+    const geheim = (x, art) => ({ art, name: x.displayName || "", start: x.startDateTime || "", ende: x.endDateTime || "" });
+    a.geheimnisse = [...(sp.passwordCredentials || []).map(x => geheim(x, "Kennwort")), ...(sp.keyCredentials || []).map(x => geheim(x, "Zertifikat"))];
+    const besitzer = await besitzerLauf;
+    a.eigentuemer = besitzer.map(o => o.userPrincipalName || o.displayName).filter(Boolean);
+    if (a.eigenerMandant) {
+      const app = ((await graphFetch(`/applications?$filter=appId eq '${a.appId}'&$select=id,passwordCredentials,keyCredentials`, { scopes: s })).value || [])[0];
+      if (app) {
+        a.appObjektId = app.id;
+        a.geheimnisse.push(...(app.passwordCredentials || []).map(x => geheim(x, "Kennwort")), ...(app.keyCredentials || []).map(x => geheim(x, "Zertifikat")));
+        const appBesitzer = await graphFetchAll(`/applications/${app.id}/owners?$select=userPrincipalName,displayName`, { scopes: s }, 50).catch(() => []);
+        a.eigentuemer = [...new Set([...a.eigentuemer, ...appBesitzer.map(o => o.userPrincipalName || o.displayName).filter(Boolean)])];
+      }
+    }
+    // Zertifikate verwalteter Identitäten erneuert Azure selbst; sie werden nicht bewertet.
+    if (a.typ === "verwaltete Identität") a.geheimnisse = [];
+    a.portal = `https://entra.microsoft.com/#view/Microsoft_AAD_IAM/ManagedAppMenuBlade/~/Permissions/objectId/${a.spId}/appId/${a.appId}`;
+    a.letzteAnmeldung = null;   // null = unbekannt, "" = keine Anmeldung gefunden
   }
 });
 
