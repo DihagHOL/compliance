@@ -948,10 +948,14 @@ Object.assign(Pim, {
       }
     }
     const apps = {};
-    for (const res of ressourcen) {
+    // Die Zuweisungen aller Ressourcen gleichzeitig holen. Ausgewertet wird in der Reihenfolge der
+    // Ressourcen, damit die Liste der Rechte je Identität dieselbe bleibt.
+    const zuweisungen = await Promise.all(ressourcen.map(res =>
+      graphFetchAll(`/servicePrincipals/${res.id}/appRoleAssignedTo?$top=999`, { scopes: s }, 5000)));
+    ressourcen.forEach((res, i) => {
       const rollen = {};
       (res.appRoles || []).forEach(r => { rollen[r.id] = r; });
-      const zuw = await graphFetchAll(`/servicePrincipals/${res.id}/appRoleAssignedTo?$top=999`, { scopes: s }, 5000);
+      const zuw = zuweisungen[i];
       zuw.filter(z => z.principalType === "ServicePrincipal").forEach(z => {
         const a = apps[z.principalId] = apps[z.principalId] || { spId: z.principalId, name: z.principalDisplayName, rechte: [], rollen: [] };
         const rolle = rollen[z.appRoleId] || {};
@@ -959,7 +963,7 @@ Object.assign(Pim, {
         a.rechte.push({ api: CC_TECH_RESSOURCEN[res.appId] || res.displayName, wert, beschreibung: rolle.displayName || "",
           kritisch: CC_KRITISCHE_RECHTE.test(wert), seit: z.createdDateTime || "" });
       });
-    }
+    });
     // Dienstprinzipale mit Verzeichnisrollen gehören ebenfalls dazu (§ 6).
     try {
       const stand = await this.lade();
@@ -970,6 +974,8 @@ Object.assign(Pim, {
     } catch (e) { /* ohne Rollendaten nur die Anwendungsberechtigungen */ }
 
     await parallelAbarbeiten(Object.values(apps), 5, async a => {
+      // Eigentümer und Dienstprinzipal hängen nicht voneinander ab: beide Abrufe laufen gleichzeitig.
+      const besitzerLauf = graphFetchAll(`/servicePrincipals/${a.spId}/owners?$select=userPrincipalName,displayName`, { scopes: s }, 50).catch(() => []);
       const sp = await graphFetch(`/servicePrincipals/${a.spId}?$select=id,appId,displayName,appOwnerOrganizationId,servicePrincipalType,accountEnabled,passwordCredentials,keyCredentials`, { scopes: s });
       a.appId = sp.appId;
       a.name = sp.displayName || a.name;
@@ -980,7 +986,7 @@ Object.assign(Pim, {
         : CC_MICROSOFT_MANDANTEN.includes(sp.appOwnerOrganizationId) ? "Microsoft-Dienst" : "Fremd-App";
       const geheim = (x, art) => ({ art, name: x.displayName || "", start: x.startDateTime || "", ende: x.endDateTime || "" });
       a.geheimnisse = [...(sp.passwordCredentials || []).map(x => geheim(x, "Kennwort")), ...(sp.keyCredentials || []).map(x => geheim(x, "Zertifikat"))];
-      const besitzer = await graphFetchAll(`/servicePrincipals/${a.spId}/owners?$select=userPrincipalName,displayName`, { scopes: s }, 50).catch(() => []);
+      const besitzer = await besitzerLauf;
       a.eigentuemer = besitzer.map(o => o.userPrincipalName || o.displayName).filter(Boolean);
       if (a.eigenerMandant) {
         const app = ((await graphFetch(`/applications?$filter=appId eq '${a.appId}'&$select=id,passwordCredentials,keyCredentials`, { scopes: s })).value || [])[0];
