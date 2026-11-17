@@ -21,12 +21,12 @@
     ],
     [CC_LISTS.tom]: [
       { id: neueId(), Title: "Zutrittskontrolle über Werksausweis", Kategorie: "Zutrittskontrolle", Beschreibung: "Vereinzelung am Werkstor, Ausweisleser an Sicherheitsbereichen.", Umsetzung: "Umgesetzt an allen Standorten.", Status: "Umgesetzt", Verantwortlich: "werkschutz@dihag.com", ControlIds: "A.7.1, A.7.2", LetztePruefung: tage(-100) },
-      { id: neueId(), Title: "Mehrfaktor-Authentifizierung für alle Konten", Kategorie: "Zugangskontrolle", Beschreibung: "MFA über Microsoft Entra ID und bedingten Zugriff.", Umsetzung: "Für Beschäftigte umgesetzt, Dienstkonten offen.", Status: "Teilweise", Verantwortlich: "fedorov@dihag.com", ControlIds: "A.8.5, D.3.1", LetztePruefung: tage(-30) },
+      { id: neueId(), Title: "Mehrfaktor-Authentifizierung für alle Konten", Kategorie: "Zugangskontrolle", Beschreibung: "MFA über Microsoft Entra ID und bedingten Zugriff.", Umsetzung: "Für Beschäftigte umgesetzt, Dienstkonten offen.", Status: "Teilweise", Verantwortlich: "erika.muster@dihag.com", ControlIds: "A.8.5, D.3.1", LetztePruefung: tage(-30) },
       { id: neueId(), Title: "Verschlüsselung mobiler Endgeräte", Kategorie: "Verschlüsselung", Beschreibung: "BitLocker über Intune erzwungen.", Umsetzung: "Umgesetzt.", Status: "Umgesetzt", Verantwortlich: "it@dihag.com", ControlIds: "A.8.1, A.8.24", LetztePruefung: tage(-60) },
-      { id: neueId(), Title: "Protokollierung und Auswertung sicherheitsrelevanter Ereignisse", Kategorie: "Eingabekontrolle", Beschreibung: "Einheitliches Überwachungsprotokoll in Microsoft Purview.", Umsetzung: "Aufbewahrung 180 Tage.", Status: "Umgesetzt", Verantwortlich: "fedorov@dihag.com", ControlIds: "A.8.15", LetztePruefung: tage(-45) }
+      { id: neueId(), Title: "Protokollierung und Auswertung sicherheitsrelevanter Ereignisse", Kategorie: "Eingabekontrolle", Beschreibung: "Einheitliches Überwachungsprotokoll in Microsoft Purview.", Umsetzung: "Aufbewahrung 180 Tage.", Status: "Umgesetzt", Verantwortlich: "erika.muster@dihag.com", ControlIds: "A.8.15", LetztePruefung: tage(-45) }
     ],
     [CC_LISTS.avv]: [
-      { id: neueId(), Title: "Microsoft Ireland Operations Ltd.", Leistung: "Microsoft 365, Azure", Kategorie: "Auftragsverarbeiter (Art. 28)", Vertragsdatum: tage(-700), Ablauf: "", Datenkategorien: "Kommunikations- und Nutzungsdaten", Drittland: "USA (Unterauftragnehmer)", Garantien: "Standardvertragsklauseln", TOMGeprueft: "Ja", LoeschungNachEnde: "Ja", Systeme: "Microsoft 365", Kontakt: "Data Protection Officer", Verantwortlich: "fedorov@dihag.com", Status: "Aktiv", NaechstePruefung: tage(120) },
+      { id: neueId(), Title: "Microsoft Ireland Operations Ltd.", Leistung: "Microsoft 365, Azure", Kategorie: "Auftragsverarbeiter (Art. 28)", Vertragsdatum: tage(-700), Ablauf: "", Datenkategorien: "Kommunikations- und Nutzungsdaten", Drittland: "USA (Unterauftragnehmer)", Garantien: "Standardvertragsklauseln", TOMGeprueft: "Ja", LoeschungNachEnde: "Ja", Systeme: "Microsoft 365", Kontakt: "Data Protection Officer", Verantwortlich: "erika.muster@dihag.com", Status: "Aktiv", NaechstePruefung: tage(120) },
       { id: neueId(), Title: "Lohnbüro Süd GmbH", Leistung: "Entgeltabrechnung", Kategorie: "Auftragsverarbeiter (Art. 28)", Vertragsdatum: tage(-1100), Ablauf: tage(45), Datenkategorien: "Abrechnungs- und Sozialversicherungsdaten", Drittland: "", Garantien: "Nicht erforderlich", TOMGeprueft: "Nein", LoeschungNachEnde: "Ja", Systeme: "Lohnportal", Kontakt: "info@lohnbuero-sued.example", Verantwortlich: "hr@dihag.com", Status: "Aktiv", NaechstePruefung: tage(8) },
       { id: neueId(), Title: "Aktenvernichtung Rhein GmbH", Leistung: "Datenträgervernichtung", Kategorie: "Auftragsverarbeiter (Art. 28)", Vertragsdatum: tage(-400), Ablauf: "", Datenkategorien: "sämtliche Papierunterlagen", Drittland: "", Garantien: "Nicht erforderlich", TOMGeprueft: "Ja", LoeschungNachEnde: "Ja", Systeme: "–", Kontakt: "", Verantwortlich: "werkschutz@dihag.com", Status: "Aktiv", NaechstePruefung: tage(200) }
     ],
@@ -40,7 +40,7 @@
         PersonName: "M. Ehemalig", PersonKontakt: "Musterstraße 1, 12345 Musterstadt", Personengruppe: "Ehemalige Beschäftigte",
         Anliegen: "Löschung aller Daten nach Austritt.", Identitaet: "Offen", IdentitaetNachweis: "", Verlaengert: "Nein",
         Systeme: "", EdiscoveryFall: "", Ergebnis: "Offen", Begruendung: "", Beantwortet: "",
-        Verantwortlich: "fedorov@dihag.com", Status: "Identität prüfen", Erinnert: "" }),
+        Verantwortlich: "erika.muster@dihag.com", Status: "Identität prüfen", Erinnert: "" }),
       berechneAnfrage({ id: neueId(), Title: "BA-2026-0815-0830", Art: "Auskunft (Art. 15)", Eingang: tage(-40), Kanal: "E-Mail",
         PersonName: "S. Beschäftigter", PersonKontakt: "s.beschaeftigter@dihag.com", Personengruppe: "Beschäftigte",
         Anliegen: "Vollständige Auskunft inkl. Kopie aller E-Mails, in denen er genannt wird.", Identitaet: "Geprüft",
@@ -55,47 +55,47 @@
     ],
     [CC_LISTS.nachweise]: [
       { id: neueId(), Title: "A.8.5", Bezeichnung: "Sichere Authentifizierung", Signal: CC_SIGNAL_LABELS.ca,
-        Wert: "2 aktive Richtlinien für bedingten Zugriff (von 4)", Stand: tage(-40), Zeit: tage(-40) + "T09:00:00Z", ErfasstVon: "fedorov@dihag.com" },
+        Wert: "2 aktive Richtlinien für bedingten Zugriff (von 4)", Stand: tage(-40), Zeit: tage(-40) + "T09:00:00Z", ErfasstVon: "erika.muster@dihag.com" },
       { id: neueId(), Title: "A.8.12", Bezeichnung: "Verhinderung von Datenlecks", Signal: CC_SIGNAL_LABELS.dlp,
-        Wert: "5 DLP-Warnungen in Microsoft Purview", Stand: tage(-12), Zeit: tage(-12) + "T09:00:00Z", ErfasstVon: "fedorov@dihag.com" },
+        Wert: "5 DLP-Warnungen in Microsoft Purview", Stand: tage(-12), Zeit: tage(-12) + "T09:00:00Z", ErfasstVon: "erika.muster@dihag.com" },
       { id: neueId(), Title: "A.5.12", Bezeichnung: "Klassifizierung von Informationen", Signal: CC_SIGNAL_LABELS.labels,
         Wert: "5 Vertraulichkeitsbezeichnungen veröffentlicht: Öffentlich, Intern, Vertraulich, Vertraulich \\ Konstruktion, Streng vertraulich",
-        Stand: tage(-120), Zeit: tage(-120) + "T09:00:00Z", ErfasstVon: "fedorov@dihag.com" }
+        Stand: tage(-120), Zeit: tage(-120) + "T09:00:00Z", ErfasstVon: "erika.muster@dihag.com" }
     ],
     [CC_LISTS.konfig]: [
       { id: neueId(), Title: "Allgemein", WertJson: JSON.stringify({
-          adminEmails: ["fedorov@dihag.com"], auditorEmails: [],
-          dsbEmail: "datenschutz@dihag.com", cisoEmail: "fedorov@dihag.com",
+          adminEmails: ["erika.muster@dihag.com"], auditorEmails: [],
+          dsbEmail: "datenschutz@dihag.com", cisoEmail: "erika.muster@dihag.com",
           mailSender: "administrator@dihag.com",
           erinnerungTageVorher: 14, eskalationTageNach: 7, erinnerungenAktiv: true,
           rmsUrl: "https://rms.dihag.de/",
           organisation: "DIHAG Foundry Group (Demo)",
           pim: {
             notfallkonten: ["notfall1@dihag.onmicrosoft.com", "notfall2@dihag.onmicrosoft.com"],
-            adminKennzeichen: [], externeDomains: [], verantwortlich: "fedorov@dihag.com",
+            adminKennzeichen: [], externeDomains: [], verantwortlich: "erika.muster@dihag.com",
             notfallGeprueft: tage(-100), notfallIntervall: 90,
-            standard: { genehmiger: ["fedorov@dihag.com", "it@dihag.com"] }
+            standard: { genehmiger: ["erika.muster@dihag.com", "it@dihag.com"] }
           }
         }) }
     ],
     [CC_LISTS.rollenregister]: [
-      { id: neueId(), Title: "u-fedorov|62e90394-69f5-4237-9190-012177145e10", Konto: "fedorov@dihag.com", Kontoart: "Person",
+      { id: neueId(), Title: "u-fedorov|62e90394-69f5-4237-9190-012177145e10", Konto: "erika.muster@dihag.com", Kontoart: "Person",
         Rolle: "Globaler Administrator", RolleId: "62e90394-69f5-4237-9190-012177145e10", Zuweisung: "berechtigt (PIM)",
         Zweck: "Leitung IT-Betrieb und Informationssicherheit, Vertretung bei Störungen", GenehmigtVon: "Geschäftsführung",
-        ZugewiesenAm: tage(-400), LetztePruefung: tage(-20), GeprueftVon: "fedorov@dihag.com", Quelle: "Entra ID" },
+        ZugewiesenAm: tage(-400), LetztePruefung: tage(-20), GeprueftVon: "erika.muster@dihag.com", Quelle: "Entra ID" },
       { id: neueId(), Title: "u-notfall1|62e90394-69f5-4237-9190-012177145e10", Konto: "notfall1@dihag.onmicrosoft.com", Kontoart: "Notfallkonto",
         Rolle: "Globaler Administrator", RolleId: "62e90394-69f5-4237-9190-012177145e10", Zuweisung: "dauerhaft",
         Zweck: "Notfallzugriff bei Aussperrung (§ 5), Zugangsdaten im Tresor der IT-Leitung", GenehmigtVon: "Geschäftsführung",
-        Ausnahme: "Notfallzugriffskonto, nach § 2.2 von PIM ausgenommen", LetztePruefung: tage(-100), GeprueftVon: "fedorov@dihag.com", Quelle: "Entra ID" },
+        Ausnahme: "Notfallzugriffskonto, nach § 2.2 von PIM ausgenommen", LetztePruefung: tage(-100), GeprueftVon: "erika.muster@dihag.com", Quelle: "Entra ID" },
       { id: neueId(), Title: "u-it|29232cdf-9323-42fd-ade2-1d097af3e4de", Konto: "it@dihag.com", Kontoart: "Person",
         Rolle: "Exchange-Administrator", RolleId: "29232cdf-9323-42fd-ade2-1d097af3e4de", Zuweisung: "dauerhaft",
-        Zweck: "Betrieb Exchange Online", GenehmigtVon: "Leitung IT", LetztePruefung: tage(-420), GeprueftVon: "fedorov@dihag.com", Quelle: "Entra ID" },
+        Zweck: "Betrieb Exchange Online", GenehmigtVon: "Leitung IT", LetztePruefung: tage(-420), GeprueftVon: "erika.muster@dihag.com", Quelle: "Entra ID" },
       { id: neueId(), Title: "u-datenschutz|4a5d8f65-41da-4de4-8968-e035b65339cf", Konto: "datenschutz@dihag.com", Kontoart: "Person",
         Rolle: "Berichtleseberechtigter", RolleId: "4a5d8f65-41da-4de4-8968-e035b65339cf", Zuweisung: "dauerhaft",
-        Zweck: "Datenschutzkontrollen (Anmelde- und Nutzungsberichte)", GenehmigtVon: "Leitung IT", LetztePruefung: tage(-60), GeprueftVon: "fedorov@dihag.com", Quelle: "Entra ID" },
+        Zweck: "Datenschutzkontrollen (Anmelde- und Nutzungsberichte)", GenehmigtVon: "Leitung IT", LetztePruefung: tage(-60), GeprueftVon: "erika.muster@dihag.com", Quelle: "Entra ID" },
       { id: neueId(), Title: "manuell-1", Konto: "datenschutz@dihag.com", Kontoart: "Person", Rolle: "Überwachungsleser (Audit Reader)",
         Zuweisung: "dauerhaft", Zweck: "Audit-Suche für Datenschutzkontrollen", GenehmigtVon: "Leitung IT", LetztePruefung: tage(-60),
-        GeprueftVon: "fedorov@dihag.com", Quelle: "manuell" },
+        GeprueftVon: "erika.muster@dihag.com", Quelle: "manuell" },
       { id: neueId(), Title: "u-altadmin|fe930be7-5e62-47db-91af-98c3a49a38b1", Konto: "alt.admin@dihag.com", Kontoart: "Person",
         Rolle: "Benutzeradministrator", RolleId: "fe930be7-5e62-47db-91af-98c3a49a38b1", Zuweisung: "dauerhaft",
         Zweck: "Benutzerverwaltung Standort Süd", GenehmigtVon: "Leitung IT", LetztePruefung: tage(-200), Quelle: "Entra ID" }
@@ -107,7 +107,7 @@
   ensureLogin = async () => ({ name: "Demo-Benutzer", username: "demo@dihag.com" });
   logout = () => location.href = location.pathname;
   getToken = async () => "demo-token";
-  getMe = async () => ({ displayName: "Denis Fedorov (Demo)", mail: "fedorov@dihag.com", department: "IT" });
+  getMe = async () => ({ displayName: "Denis Fedorov (Demo)", mail: "erika.muster@dihag.com", department: "IT" });
   getSiteId = async () => "demo-site";
   spGetAll = async (liste) => (daten[liste] || []).map(f => ({ id: f.id, fields: f, lastModifiedDateTime: new Date().toISOString() }));
   spCreate = async (liste, felder) => {
@@ -130,7 +130,7 @@
   sendMail = async () => { toast("Demo-Modus: Es wurde keine E-Mail versendet."); };
   Store.personen = async () => [
     { name: "Datenschutz DIHAG", mail: "datenschutz@dihag.com" },
-    { name: "Denis Fedorov", mail: "fedorov@dihag.com" },
+    { name: "Denis Fedorov", mail: "erika.muster@dihag.com" },
     { name: "IT-Service", mail: "it@dihag.com" },
     { name: "Personalabteilung", mail: "hr@dihag.com" },
     { name: "Werkschutz", mail: "werkschutz@dihag.com" }
@@ -145,19 +145,19 @@
   });
   const risikenDemo = [
     { id: "r1", titel: "Ransomware-Angriff auf Produktionsnetz", beschreibung: "Verschlüsselung der Fertigungssteuerung.", kategorie: "Technik / IT",
-      eigner: "fedorov@dihag.com", wert: 15, status: "in Behandlung", naechsteReview: tage(12),
+      eigner: "erika.muster@dihag.com", wert: 15, status: "in Behandlung", naechsteReview: tage(12),
       massnahmen: [{ titel: "Segmentierung OT-Netz", verantwortlich: "it@dihag.com", frist: tage(-3), status: "in Umsetzung" },
                    { titel: "Wiederherstellungstest Backup", verantwortlich: "it@dihag.com", frist: tage(20), status: "offen" }],
       controls: ["A.8.7", "A.8.13", "A.8.22"] },
     { id: "r2", titel: "Abfluss von Konstruktionsdaten über Cloud-Speicher", beschreibung: "CAD-Daten in privaten Diensten.", kategorie: "Technik / IT",
       eigner: "it@dihag.com", wert: 12, status: "in Behandlung", naechsteReview: tage(40),
-      massnahmen: [{ titel: "DLP-Regel für CAD-Dateien", verantwortlich: "fedorov@dihag.com", frist: tage(9), status: "offen" }],
+      massnahmen: [{ titel: "DLP-Regel für CAD-Dateien", verantwortlich: "erika.muster@dihag.com", frist: tage(9), status: "offen" }],
       controls: ["A.8.12", "A.5.12"] },
     { id: "r3", titel: "Ausfall Lohnabrechnungsdienstleister", beschreibung: "", kategorie: "Lieferanten / Dienstleister",
       eigner: "hr@dihag.com", wert: 8, status: "offen", naechsteReview: tage(-5), massnahmen: [], controls: ["A.5.19"] },
     { id: "r4", titel: "Fehlende MFA bei Dienstkonten", beschreibung: "", kategorie: "Technik / IT",
-      eigner: "fedorov@dihag.com", wert: 16, status: "offen", naechsteReview: tage(25),
-      massnahmen: [{ titel: "Dienstkonten auf verwaltete Identitäten umstellen", verantwortlich: "fedorov@dihag.com", frist: tage(30), status: "offen" }],
+      eigner: "erika.muster@dihag.com", wert: 16, status: "offen", naechsteReview: tage(25),
+      massnahmen: [{ titel: "Dienstkonten auf verwaltete Identitäten umstellen", verantwortlich: "erika.muster@dihag.com", frist: tage(30), status: "offen" }],
       controls: ["A.8.5"] }
   ];
   const wirkDemo = [
@@ -165,8 +165,8 @@
       herkunftId: "", verantwortlich: "it@dihag.com",
       massnahmen: [{ titel: "Quartalsreview einführen", verantwortlich: "it@dihag.com", frist: tage(-10), status: "in Umsetzung" }] },
     { id: "w2", titel: "Warnung: Verdächtige Anmeldung aus ungewöhnlichem Land", art: "abweichung", status: "offen", quelle: CC_RMS.quelle,
-      herkunftId: "m365:al0", verantwortlich: "fedorov@dihag.com",
-      massnahmen: [{ titel: "Konto sperren und Kennwort zurücksetzen", verantwortlich: "fedorov@dihag.com", frist: tage(2), status: "offen" }] }
+      herkunftId: "m365:al0", verantwortlich: "erika.muster@dihag.com",
+      massnahmen: [{ titel: "Konto sperren und Kennwort zurücksetzen", verantwortlich: "erika.muster@dihag.com", frist: tage(2), status: "offen" }] }
   ];
   Object.assign(Rms, {
     soa: async () => soaDemo,
@@ -207,7 +207,7 @@
         quelle: quellen[i % quellen.length], kategorie: ["InitialAccess", "Exfiltration", "Malware", "Collection"][i % 4],
         erstellt: new Date(Date.now() - i * 7200000).toISOString(),
         aktualisiert: new Date(Date.now() - i * 3600000).toISOString(),
-        zugewiesen: i % 3 === 0 ? "fedorov@dihag.com" : "", beschreibung: "Beispielwarnung aus dem Demo-Modus.",
+        zugewiesen: i % 3 === 0 ? "erika.muster@dihag.com" : "", beschreibung: "Beispielwarnung aus dem Demo-Modus.",
         webUrl: ""
       }));
       if (nurOffen) a = a.filter(x => x.status !== "resolved");
@@ -254,7 +254,7 @@
     auditQueryStatus: async () => ({ status: "succeeded" }),
     auditQueryRecords: async () => zufall(25, i => ({
       zeit: new Date(Date.now() - i * 5400000).toISOString(),
-      benutzer: ["fedorov@dihag.com", "it@dihag.com", "hr@dihag.com"][i % 3],
+      benutzer: ["erika.muster@dihag.com", "it@dihag.com", "hr@dihag.com"][i % 3],
       operation: ["FileDownloaded", "FileDeleted", "UserLoggedIn", "SharingSet", "MailItemsAccessed"][i % 5],
       dienst: ["SharePoint", "Exchange", "AzureActiveDirectory"][i % 3],
       workload: "", objekt: "/sites/IT/Freigegebene Dokumente/Datei" + i + ".docx",
@@ -264,7 +264,7 @@
       zeit: new Date(Date.now() - i * 9000000).toISOString(),
       kategorie: ["UserManagement", "GroupManagement", "ApplicationManagement", "Policy"][i % 4],
       aktivitaet: ["Benutzer aktualisiert", "Mitglied zu Gruppe hinzugefügt", "Anwendung registriert", "Richtlinie geändert"][i % 4],
-      ergebnis: "success", akteur: ["fedorov@dihag.com", "administrator@dihag.com"][i % 2],
+      ergebnis: "success", akteur: ["erika.muster@dihag.com", "administrator@dihag.com"][i % 2],
       ziel: "Benutzer " + i
     })),
     conditionalAccessPolicies: async () => [
@@ -274,9 +274,9 @@
       { id: "c4", name: "Risikoanmeldungen blockieren", status: "disabled", erstellt: "", geaendert: "", kontrollen: "block" }
     ],
     privilegierteRollen: async () => [
-      { name: "Globaler Administrator", beschreibung: "", mitglieder: ["administrator@dihag.com", "fedorov@dihag.com"] },
+      { name: "Globaler Administrator", beschreibung: "", mitglieder: ["administrator@dihag.com", "erika.muster@dihag.com"] },
       { name: "Exchange-Administrator", beschreibung: "", mitglieder: ["it@dihag.com"] },
-      { name: "Compliance-Administrator", beschreibung: "", mitglieder: ["fedorov@dihag.com", "datenschutz@dihag.com"] },
+      { name: "Compliance-Administrator", beschreibung: "", mitglieder: ["erika.muster@dihag.com", "datenschutz@dihag.com"] },
       { name: "Intune-Administrator", beschreibung: "", mitglieder: ["it@dihag.com"] }
     ],
     benutzerStatistik: async () => ({ gesamt: 348, gaeste: 27, deaktiviert: 41 }),
@@ -310,7 +310,7 @@
     "u-notfall1": { upn: "notfall1@dihag.onmicrosoft.com", name: "Notfallkonto 1" },
     "u-notfall2": { upn: "notfall2@dihag.onmicrosoft.com", name: "Notfallkonto 2" },
     "u-admin": { upn: "administrator@dihag.com", name: "Administrator" },
-    "u-fedorov": { upn: "fedorov@dihag.com", name: "Denis Fedorov" },
+    "u-fedorov": { upn: "erika.muster@dihag.com", name: "Denis Fedorov" },
     "u-it": { upn: "it@dihag.com", name: "IT-Service" },
     "u-datenschutz": { upn: "datenschutz@dihag.com", name: "Datenschutz DIHAG" },
     "u-hr": { upn: "hr@dihag.com", name: "Personalabteilung" },
@@ -368,7 +368,7 @@
     const zweck = zwecke[[2, 3, 1, 6, 0, 3, 5][i % 7]];
     return {
       Title: "req-" + i, Rolle: (anlage3Rolle(rolle) || {}).name, RolleId: rolle,
-      Konto: ["fedorov@dihag.com", "it@dihag.com", "datenschutz@dihag.com", "kbr.vorsitz@dihag.com"][i % 4],
+      Konto: ["erika.muster@dihag.com", "it@dihag.com", "datenschutz@dihag.com", "kbr.vorsitz@dihag.com"][i % 4],
       Zeit: isoTage(-i * 4 - 1), Dauer: ["PT2H", "PT4H", "PT1H"][i % 3], Zweck: i % 9 === 8 ? CC_ZWECK_OHNE : zweck,
       Begruendung: i % 9 === 8 ? "Kurz nachsehen" : `[${zweck}] Beispielaktivierung ${i}`, Ticket: "", Status: i % 11 === 5 ? "Denied" : "Provisioned"
     };
@@ -406,7 +406,7 @@
   ];
 
   Object.assign(Pim, {
-    ich: async () => ({ id: "u-fedorov", userPrincipalName: "fedorov@dihag.com", displayName: "Denis Fedorov" }),
+    ich: async () => ({ id: "u-fedorov", userPrincipalName: "erika.muster@dihag.com", displayName: "Denis Fedorov" }),
     lade: async () => {
       const zeilen = pimInst.map(demoZeile);
       pimInst.filter(x => pimGruppen[x.pid]).forEach(x => pimGruppen[x.pid].mitglieder.forEach(m =>
@@ -455,7 +455,7 @@
       if (!kritisch) pimInst.push({ pid: "u-fedorov", rolle: rolleId, art: "aktiviert", start: new Date().toISOString(),
         ende: new Date(Date.now() + stunden * 3600000).toISOString() });
       demoAktivierungen.unshift({ Title: "req-" + Date.now(), Rolle: (anlage3Rolle(rolleId) || {}).name, RolleId: rolleId,
-        Konto: "fedorov@dihag.com", Zeit: new Date().toISOString(), Dauer: `PT${stunden}H`, Zweck: zweck,
+        Konto: "erika.muster@dihag.com", Zeit: new Date().toISOString(), Dauer: `PT${stunden}H`, Zweck: zweck,
         Begruendung: `[${zweck}] ${text}`, Ticket: "", Status: kritisch ? "PendingApproval" : "Provisioned" });
       return { status: kritisch ? "PendingApproval" : "Provisioned" };
     },
