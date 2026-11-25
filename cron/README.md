@@ -12,10 +12,20 @@ und der Wochenbericht.
 | 2 | Betroffenenanfragen: 7 und 2 Tage vor Fristende, nach Ablauf Eskalation | Bearbeiter + DSB / DSB, CISO, Administratoren |
 | 3 | montags: Datenschutz-Wochenbericht mit Anfragen, fälligen Prüfungen und TOM | DSB, CISO, Administratoren |
 | 4 | täglich: PIM-Aktivierungen nach `Compliance_PIMAktivierungen` sichern (Anlage 3 § 9) | keine Mail |
+| 5 | täglich: Höchstzahlen der Admin-Rollen prüfen (Anlage 3 § 11); Mail nur, wenn sich eine Überschreitung neu ergibt oder ändert | Verantwortlicher aus den Einstellungen („Rollen- und Berechtigungskonzept“), sonst CISO |
 
 Schritt 4 läuft auch, wenn die Erinnerungen in der App abgeschaltet sind. PIM hält Aktivierungen nur
 etwa 30 Tage vor; ohne diese Sicherung fehlen der Quartalsübersicht für den KBR Daten, sobald niemand
 die Ansicht „Admin-Rollen“ öffnet. Die App sichert beim Öffnen ebenfalls.
+
+Schritt 5 zählt je Rolle die gleichzeitig aktiven personenbezogenen Rolleninhaber (dauerhaft oder gerade
+aktiviert) und vergleicht sie mit der Höchstzahl aus `js/pim.js`. Nicht gezählt werden berechtigte Personen,
+Notfallkonten (Einstellung und Rollenregister), technische Konten und Dienstprinzipale. Die Mail nennt Rollen
+und Zahlen, keine Namen; gelesen werden nur Konto, Rolle und Art der Zuweisung, keine Anmelde- oder
+Aktivitätsdaten. Der zuletzt gemeldete Stand liegt in `Compliance_Konfiguration` unter dem Titel
+`PimHoechstzahlen`, damit keine tägliche Mail entsteht. Kann der Cron die Konten nicht lesen, wird nichts gemeldet
+und der Lauf schreibt einen Hinweis ins Protokoll. Schritt 5 gehört zu den Erinnerungen und entfällt, wenn sie
+abgeschaltet sind.
 
 Risiken, Maßnahmen und Vorfälle erinnert der Cron des RMS (`richtlinienmanagementsystem/scripts/erinnerungen.mjs`).
 
@@ -38,8 +48,9 @@ Anwendungsberechtigungen (Admin-Zustimmung erforderlich):
 * `Sites.ReadWrite.All` – oder besser `Sites.Selected` mit `write`-Grant auf `/sites/IT`
 * `Mail.Send` – empfohlen über eine Application Access Policy in Exchange Online auf das
   Postfach `administrator@dihag.com` beschränken
-* `RoleAssignmentSchedule.Read.Directory` – nur lesend, für Schritt 4. Fehlt sie, wird der Schritt
-  mit Hinweis übersprungen.
+* `RoleAssignmentSchedule.Read.Directory` – nur lesend, für die Schritte 4 und 5. Fehlt sie, werden die
+  Schritte mit Hinweis übersprungen. Schritt 5 braucht zusätzlich das Lesen der Konten (`$expand=principal`);
+  genügt die Berechtigung dafür nicht, steht das im Protokoll und es wird nichts gemeldet.
 
 ## Umgebungsvariablen (im Workflow gesetzt)
 

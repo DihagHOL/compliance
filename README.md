@@ -19,7 +19,7 @@ M365-Nachweise je Annex-A-Control und die Datenschutz-Register.
 | **Datenschutz** | VVT (Art. 30), TOM (Art. 32), Auftragsverarbeiter (Art. 28), **Betroffenenanfragen** (Art. 15–21) mit Fristberechnung, Suchumfang aus dem VVT, eDiscovery-Fall und Antwortentwürfen; Datenpannen laufen über Ticket und RMS-Vorfälle |
 | **Berichte** | Datenschutzbericht (druck-/PDF-fähig), Nachweis-Snapshot aller M365-Signale und die Quartalsübersicht für den KBR nach Anlage 3 § 9 (ohne Namen); SoA und ISMS-Berichte im RMS |
 | **Bedienung** | Globale Suche (`/`, inkl. Rollenregister und RMS-Risiken), Sammelbearbeitung, Personenauswahl aus dem Verzeichnis, Direktlinks, gemerkte Filter |
-| **Cron** | Datenschutz-Prüffristen, Antwortfristen der Betroffenenanfragen, Datenschutz-Wochenbericht, Sichern der PIM-Aktivierungen |
+| **Cron** | Datenschutz-Prüffristen, Antwortfristen der Betroffenenanfragen, Datenschutz-Wochenbericht, Sichern der PIM-Aktivierungen, Meldung bei überschrittenen Höchstzahlen der Admin-Rollen |
 
 ## Zusammenspiel mit dem RMS
 

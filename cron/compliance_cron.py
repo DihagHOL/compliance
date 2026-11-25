@@ -9,6 +9,8 @@ kann (zeitgesteuerte Erinnerungen und Berichte):
   3. Montags: Datenschutz-Wochenbericht an DSB, CISO und Administratoren
   4. PIM: Aktivierungen von Admin-Rollen sichern (Anlage 3 Par. 9 der KBV);
      PIM selbst haelt sie nur etwa 30 Tage vor
+  5. PIM: Hoechstzahlen der Rollen pruefen (Anlage 3 Par. 11); bei Ueberschreitung
+     Mail an den Verantwortlichen (ISB/IT-Leitung), ohne Namen
 
 Controls/SoA, Risiken, Vorfaelle und Massnahmen fuehrt das RMS; dessen eigener
 Cron (richtlinienmanagementsystem/scripts/erinnerungen.mjs) erinnert dort.
@@ -23,6 +25,7 @@ Ohne gesetzte Secrets endet der Lauf als gruener No-op.
 """
 
 import os
+import re
 import sys
 import json
 import datetime
@@ -46,6 +49,8 @@ L_TOM = "Compliance_TOM"
 L_ANFRAGEN = "Compliance_Anfragen"
 L_PIM = "Compliance_PIMAktivierungen"
 L_KONFIG = "Compliance_Konfiguration"
+L_REGISTER = "Compliance_Rollenregister"
+KONFIG_HOECHSTZAHL = "PimHoechstzahlen"
 
 GRAPH = "https://graph.microsoft.com/v1.0"
 
@@ -453,6 +458,138 @@ def run_pim(k):
     print(f"PIM: {neu} Aktivierungen neu gesichert, {aktualisiert} aktualisiert")
 
 
+def rollenkatalog():
+    """Rollenkatalog der Anlage 3 (Template-ID -> Name, Hoechstzahl) aus js/pim.js.
+
+    Die Datei ist die einzige Quelle; der Cron liegt im selben Repository und
+    liest sie, statt die Liste ein zweites Mal zu fuehren."""
+    pfad = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "js", "pim.js")
+    with open(pfad, encoding="utf-8") as f:
+        quelltext = f.read()
+    katalog = {}
+    muster = r'[{] id: "([0-9a-f-]{36})", kat: "[^"]+", name: "([^"]+)", p: (?:true|false), max: ([0-9]+)'
+    for m in re.finditer(muster, quelltext):
+        katalog[m.group(1)] = (m.group(2), int(m.group(3)))
+    return katalog
+
+
+def aktive_zuweisungen():
+    """Alle gerade wirksamen Zuweisungen (dauerhaft oder aktiviert) samt Konto.
+
+    Ohne das Konto (expand) lassen sich Personen nicht von Dienstprinzipalen und
+    Gruppen trennen; dann wird nichts gezaehlt, statt falsch zu melden."""
+    url = "/roleManagement/directory/roleAssignmentScheduleInstances?$expand=principal"
+    out = []
+    while url:
+        d = api("GET", url)
+        out += d.get("value", [])
+        url = d.get("@odata.nextLink")
+    return out
+
+
+def run_hoechstzahlen(k):
+    """Anlage 3 Par. 11: Wird eine Ueberschreitung der Hoechstzahlen festgestellt,
+    erfolgt eine automatisierte Benachrichtigung an IT-Leitung bzw. ISB.
+
+    Gezaehlt werden nach Par. 2.3 die gleichzeitig aktiven personenbezogenen
+    Rolleninhaber (dauerhaft oder gerade aktiviert). Nicht gezaehlt werden nur
+    berechtigte Personen, Notfallkonten, technische Konten, Dienstprinzipale und
+    verwaltete Identitaeten. Die Auswertung liest nur die Angaben des
+    Rollenregisters (Konto, Rolle, Art) und verarbeitet keine Anmelde- oder
+    Aktivitaetsdaten; die Mail nennt Rollen und Zahlen, keine Namen."""
+    katalog = rollenkatalog()
+    if not katalog:
+        print("Hoechstzahlen: Rollenkatalog in js/pim.js nicht lesbar, uebersprungen.")
+        return
+    try:
+        zuweisungen = aktive_zuweisungen()
+    except RuntimeError as e:
+        if "-> 400" in str(e) or "-> 401" in str(e) or "-> 403" in str(e):
+            print("Hoechstzahlen: Zuweisungen samt Konto nicht lesbar (RoleAssignmentSchedule.Read.Directory "
+                  "und Directory.Read.All), uebersprungen.")
+            return
+        raise
+
+    # Konten, die nicht mitzaehlen: laut Rollenregister technisch oder Notfallkonto,
+    # laut Einstellung Notfallkonto.
+    ausgenommen = set()
+    for i in items_oder_leer(L_REGISTER):
+        f = i.get("fields", {})
+        if f.get("Kontoart") in ("Technisch", "Notfallkonto"):
+            ausgenommen.add(str(f.get("Title") or "").split("|")[0].lower())
+    notfall = {str(a).strip().lower() for a in ((k.get("pim") or {}).get("notfallkonten") or [])}
+
+    halter = {}
+    for z in zuweisungen:
+        rolle = z.get("roleDefinitionId")
+        if rolle not in katalog:
+            continue
+        p = z.get("principal") or {}
+        art = str(p.get("@odata.type") or "").lower()
+        # Dienstprinzipale und Gruppen selbst zaehlen nicht; Mitglieder einer Gruppe
+        # erscheinen als eigene Zuweisung je Person.
+        if art and not art.endswith(".user"):
+            continue
+        pid = str(z.get("principalId") or "").lower()
+        upn = str(p.get("userPrincipalName") or "").lower()
+        if pid in ausgenommen or (upn and (upn in notfall or upn in ausgenommen)):
+            continue
+        halter.setdefault(rolle, set()).add(pid)
+
+    zu_viele = []
+    for rolle, personen in halter.items():
+        name, hoechst = katalog[rolle]
+        if len(personen) > hoechst:
+            zu_viele.append((name, len(personen), hoechst))
+    zu_viele.sort()
+    signatur = ";".join(f"{n}:{a}/{m}" for n, a, m in zu_viele)
+
+    # Nur bei Aenderung erneut melden, damit keine taegliche Mail entsteht.
+    alt_item = None
+    for i in items_oder_leer(L_KONFIG):
+        if i.get("fields", {}).get("Title") == KONFIG_HOECHSTZAHL:
+            alt_item = i
+            break
+    alt_signatur = ""
+    if alt_item:
+        try:
+            alt_signatur = json.loads(alt_item["fields"].get("WertJson") or "{}").get("signatur", "")
+        except ValueError:
+            alt_signatur = ""
+    if signatur == alt_signatur:
+        print(f"Hoechstzahlen: {len(zu_viele)} Ueberschreitung(en), unveraendert seit der letzten Meldung.")
+        return
+
+    if zu_viele:
+        ziel = (k.get("pim") or {}).get("verantwortlich") or k.get("cisoEmail")
+        if not ziel:
+            print("Hoechstzahlen: Ueberschreitung festgestellt, aber kein Verantwortlicher in den Einstellungen "
+                  "(Rollen- und Berechtigungskonzept) eingetragen.", file=sys.stderr)
+            return
+        zeilen = "".join(
+            f"<tr><td>{esc(n)}</td><td style='text-align:right'><b>{a}</b></td><td style='text-align:right'>{m}</td></tr>"
+            for n, a, m in zu_viele)
+        html = rahmen(
+            "<p>Bei folgenden Rollen ist die Höchstzahl der gleichzeitig aktiven personenbezogenen Rolleninhaber "
+            "nach Anlage 3 § 2.3 und § 3 überschritten. Gezählt werden dauerhaft zugewiesene und gerade aktivierte "
+            "Personen, nicht Notfallkonten, technische Identitäten und nur berechtigte Personen.</p>"
+            "<table cellpadding='6' style='border-collapse:collapse'>"
+            "<tr><th align='left'>Rolle</th><th>aktiv</th><th>Höchstzahl</th></tr>" + zeilen + "</table>"
+            "<p>Die Meldung nennt keine Namen. Wer die Rolle innehat, steht im Compliance-Cockpit unter "
+            "„Admin-Rollen“.</p>", "Höchstzahl bei Administratorrollen überschritten",
+            APP_URL + "?ansicht=rollen")
+        send_mail(ziel, f"Anlage 3: Höchstzahl bei {len(zu_viele)} Administratorrolle(n) überschritten", html)
+        print(f"Hoechstzahlen: {len(zu_viele)} Ueberschreitung(en) gemeldet an {ziel}.")
+    else:
+        print("Hoechstzahlen: keine Ueberschreitung mehr.")
+
+    wert = json.dumps({"signatur": signatur, "stand": HEUTE.isoformat()})
+    if alt_item:
+        patch_fields(L_KONFIG, alt_item["id"], {"WertJson": wert})
+    else:
+        create_item(L_KONFIG, {"Title": KONFIG_HOECHSTZAHL, "WertJson": wert})
+
+
 # --------------------------------------------------------------------------
 
 def main():
@@ -466,7 +603,7 @@ def main():
     if not k.get("erinnerungenAktiv", True):
         print("Erinnerungen sind in den App-Einstellungen deaktiviert – nichts zu tun.")
         return
-    for schritt in (run_datenschutz, run_anfragen, run_wochenbericht):
+    for schritt in (run_datenschutz, run_anfragen, run_wochenbericht, run_hoechstzahlen):
         try:
             schritt(k)
         except Exception as e:

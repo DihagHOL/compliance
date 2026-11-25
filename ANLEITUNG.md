@@ -213,7 +213,8 @@ GitHub Actions ruft täglich `cron/compliance_cron.py` auf (App-only, Client-Cre
 Benötigt werden die Repository-Secrets `CC_TENANT_ID`, `CC_CLIENT_ID`, `CC_CLIENT_SECRET`
 der App-Registrierung **„DIHAG Cron-Job"** (`089bf9ad-2d9a-4cbc-b85d-88b4484af0bb`) mit den
 Anwendungsberechtigungen `Sites.ReadWrite.All` (oder `Sites.Selected` + Grant auf `/sites/IT`)
-und `Mail.Send`, für Schritt 4 zusätzlich `RoleAssignmentSchedule.Read.Directory`.
+und `Mail.Send`, für die Schritte 4 und 5 zusätzlich `RoleAssignmentSchedule.Read.Directory`.
+Schritt 5 meldet dem Verantwortlichen (Anlage 3 § 11), wenn bei einer Admin-Rolle die Höchstzahl überschritten ist.
 Details: [cron/README.md](cron/README.md).
 
 Der Lauf erledigt:
